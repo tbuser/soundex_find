@@ -58,6 +58,7 @@ module WGJ #:nodoc:
       SoundexNums  = '111122222222334556'
       SoundexCharsEx = '^' + SoundexChars
       SoundexCharsDel = '^A-Z'
+      SoundexSkipChars = 'HW'
     
       # desc: http://en.wikipedia.org/wiki/Soundex
       # more examples: http://www.archives.gov/genealogy/census/soundex.html
@@ -65,21 +66,34 @@ module WGJ #:nodoc:
       # adapted from Alexander Ermolaev
       # http://snippets.dzone.com/posts/show/4530
       def soundex(string)
-        str     = string.upcase.delete(SoundexCharsDel).squeeze    
         limit   = self.sdx_options[:limit]
         strict  = self.sdx_options[:strict]
-        
+
+        # replace skip chars, remove invalid chars
+        str     = string.upcase.tr(SoundexSkipChars, "|").delete(SoundexCharsDel).squeeze    
+
         # soundex rules state duplicate numbers not seperated by vowels get combined, so for now turn vowels into _'s
         result = str[0 .. -1].tr(SoundexCharsEx, "_").tr(SoundexChars, SoundexNums) rescue ''
+
+        # remove skip char placeholders and following code if they follow a consonant
+        result = result.gsub(/#{SoundexSkipChars.split(//).join("|")}\d/, "")
         
         # combine duplicate codes not seperated by vowels
         result = result.squeeze
 
-        # remove vowel place holders and obey limit
-        result = result.gsub("_", "")[0 .. (limit ? (limit) : -1)]
+        # remove vowel place holders (except first char if it is _)
+        result = result[0 .. 0].to_s + result[1 .. -1].to_s.gsub("_", "")
+        
+        # obey limit if set
+        result = result[0 .. (limit ? (limit) : -1)].to_s
         
         # when strict, turn first code back into the first character of the string
-        result = str[0 .. 0].to_s + result[1 .. -1].to_s if strict
+        if strict
+          result = string[0 .. 0].upcase.to_s + result[1 .. -1].to_s
+        else
+          # if not strict, remove first character if it's an _
+          result = result[1 .. -1].to_s if result[0 .. 0].to_s == "_"
+        end
         
         # pad up to limit with 0's
         result = result.ljust(limit + 1, "0") if limit

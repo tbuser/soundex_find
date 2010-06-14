@@ -38,6 +38,8 @@ NAMES = {
   "super"         => "S160", 
   "supernatural"  => "S165",
 
+  "washington"    => "W252",
+  "lee"           => "L000",
   "gutierrez"     => "G362",
   "pfister"       => "P236",
   "jackson"       => "J250",

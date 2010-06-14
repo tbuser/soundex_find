@@ -32,16 +32,16 @@ class SoundexFindTest < Test::Unit::TestCase
     
     should "find records when using " do
       items = Item.soundex_find(:all, :soundex => "")
-      assert_equal(11, items.size, "blank soundex string")
+      assert_equal(NAMES.size, items.size, "blank soundex string")
 
       items = Item.soundex_find(:all, :soundex => "zoo")
-      assert_equal(11, items.size, "different first letter")
+      assert_equal(12, items.size, "different first letter #{Item.soundex("zoo")}")
 
       items = Item.soundex_find(:all, :soundex => "per")
       assert_equal(4, items.size, "internal substring")
 
       items = Item.soundex_find(:all, :soundex => "su")
-      assert_equal(11, items.size, "short string")
+      assert_equal(12, items.size, "short string")
 
       items = Item.soundex_find(:all, :soundex => "sheuvir")
       assert_equal(4, items.size, "phonetic string")
