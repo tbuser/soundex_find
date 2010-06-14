@@ -1,8 +1,5 @@
 soundex_find_test:
-  adapter: mysql
+  adapter: sqlite3
   database: soundex_find_test
-  username: root
-  password:
-  host: localhost
 
 

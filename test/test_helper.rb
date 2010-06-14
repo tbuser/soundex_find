@@ -29,4 +29,21 @@ load(File.dirname(__FILE__) + "/schema.rb")
  
 # load the ActiveRecord models
 require File.dirname(__FILE__) + '/models/item.rb'
- 
+
+# Standard Soundex Codes from http://resources.rootsweb.ancestry.com/cgi-bin/soundexconverter
+# and examples from http://www.archives.gov/genealogy/census/soundex.html
+NAMES = {
+  "sue"           => "S000", 
+  "soup"          => "S100", 
+  "super"         => "S160", 
+  "supernatural"  => "S165",
+
+  "gutierrez"     => "G362",
+  "pfister"       => "P236",
+  "jackson"       => "J250",
+  "tymczak"       => "T522",
+  "ashcraft"      => "A261",
+
+  "schaffer"      => "S160",
+  "shaffer"       => "S160"
+}

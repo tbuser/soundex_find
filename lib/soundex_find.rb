@@ -60,22 +60,31 @@ module WGJ #:nodoc:
       SoundexCharsDel = '^A-Z'
     
       # desc: http://en.wikipedia.org/wiki/Soundex
+      # more examples: http://www.archives.gov/genealogy/census/soundex.html
+      # online converter to compare standard strict options: http://resources.rootsweb.ancestry.com/cgi-bin/soundexconverter
       # adapted from Alexander Ermolaev
       # http://snippets.dzone.com/posts/show/4530
       def soundex(string)
-        str = string.upcase.delete(SoundexCharsDel).squeeze
-    
-        limit = self.sdx_options[:limit]
+        str     = string.upcase.delete(SoundexCharsDel).squeeze    
+        limit   = self.sdx_options[:limit]
+        strict  = self.sdx_options[:strict]
         
-        if self.sdx_options[:strict]
-          str[0 .. 0] + str[1 .. -1].
-              delete(SoundexCharsEx).
-              tr(SoundexChars, SoundexNums)[0 .. (limit ? (limit-1) : -1)] rescue ''
-        else
-          str[0 .. -1].
-              delete(SoundexCharsEx).
-              tr(SoundexChars, SoundexNums)[0 .. (limit ? (limit) : -1)] rescue ''
-        end
+        # soundex rules state duplicate numbers not seperated by vowels get combined, so for now turn vowels into _'s
+        result = str[0 .. -1].tr(SoundexCharsEx, "_").tr(SoundexChars, SoundexNums) rescue ''
+        
+        # combine duplicate codes not seperated by vowels
+        result = result.squeeze
+
+        # remove vowel place holders and obey limit
+        result = result.gsub("_", "")[0 .. (limit ? (limit) : -1)]
+        
+        # when strict, turn first code back into the first character of the string
+        result = str[0 .. 0].to_s + result[1 .. -1].to_s if strict
+        
+        # pad up to limit with 0's
+        result = result.ljust(limit + 1, "0") if limit
+        
+        result
       end
       
     end
